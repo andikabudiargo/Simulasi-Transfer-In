@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer & Produksi</title>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+   <script src="https://cdn.tailwindcss.com"></script>
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body class="bg-gray-100">
+<div class="p-6 space-y-8">
+ 
+<div class="bg-blue-50 border border-blue-200 rounded-2xl p-5">
+  <h2 class="text-lg font-semibold text-blue-700 mb-3">
+    Panduan Penggunaan
+  </h2>
+
+  <ol class="list-decimal pl-5 space-y-2 text-sm text-blue-900">
+    <li>
+      <strong>Bill of Material (BOM)</strong> menunjukkan hubungan antara
+      <strong>Raw Material (RM)</strong> dan <strong>Finish Good (FG)</strong>.
+      Satu RM dapat menghasilkan lebih dari satu FG.
+    </li>
+
+    <li>
+      Saat melakukan <strong>Transfer Out dari Gudang Raw Material ke Spraybooth</strong>,
+      user <strong>memilih FG</strong>, bukan RM.
+    </li>
+
+    <li>
+      Tapi sistem akan secara otomatis:
+      <ul class="list-disc pl-5 mt-1">
+        <li>Mengurangi stok <strong>RM</strong> di Gudang Raw Material</li>
+        <li>Menambahkan stok <strong>FG</strong> ke Spraybooth</li>
+        <li>Berdasarkan relasi <strong>BOM</strong> yang berlaku</li>
+      </ul>
+    </li>
+
+    <li>
+      Jika stok RM tidak mencukupi, proses produksi tidak dapat dilakukan.
+    </li>
+
+    <li>
+      <strong>Transfer In</strong> digunakan hanya untuk penerimaan barang dari Supplier.
+    </li>
+    <li>
+      <strong>Transfer Out</strong> digunakan untuk peredaran barang di Internal.
+    </li>
+  </ol>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow p-5">
+  <h2 class="text-lg font-semibold mb-4 text-indigo-600">
+    Bill of Material (BOM)
+  </h2>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full border text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-3 py-2">Raw Material (RM)</th>
+          <th class="border px-3 py-2">Finish Good (FG)</th>
+        </tr>
+      </thead>
+      <tbody>
+        
+        <tr>
+          <td class="border px-3 py-2 font-medium">
+            RMNPAPI04 - COVER MIRROR SFG D21 LH
+          </td>
+          <td class="border px-3 py-2">
+            FGAPI0014 - COVER UPR OUTER MIRROR LH SILVER (B2) D21_SB
+          </td>
+        </tr>
+        <tr>
+          <td class="border px-3 py-2 font-medium">
+            RMNPAPI04 - COVER MIRROR SFG D21 LH
+          </td>
+          <td class="border px-3 py-2">
+            FGAPI0028 - COVER OUTER MIRROR LH D21 BLACK X13
+          </td>
+        </tr>
+
+        
+        <tr>
+          <td class="border px-3 py-2 font-medium">
+            RMAPI01 - MOLDING RH
+          </td>
+          <td class="border px-3 py-2">
+            FGAPI0003 - MOLDING QTR WIN UPR RH 62791-0K03000_SB
+          </td>
+        </tr>
+        <tr>
+          <td class="border px-3 py-2 font-medium">
+            RMAPI01 - MOLDING RH
+          </td>
+          <td class="border px-3 py-2">
+            FGAPI0066 - ASSY MOLDING QTR WIN UPR RH 62791-0K03000_SB
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    
+    <div class="bg-white rounded-2xl shadow p-5">
+      <h2 class="text-lg font-semibold mb-4 text-emerald-600">
+        Transfer In (Transfer Supplier → Gudang)
+      </h2>
+
+      <div class="space-y-4">
+        <input type="date" id="inDate" class="w-full border rounded-lg px-3 py-2">
+
+        <select id="inFrom" class="w-full border rounded-lg px-3 py-2">
+          <option value="">Supplier</option>
+          <option>API00001SUPP - AUTOPLASTIK INDONESIA</option>
+        </select>
+
+        <select id="inArticle" class="w-full border rounded-lg px-3 py-2">
+          <option value="">Pilih Article</option>
+          <option>RMNPAPI04 - COVER MIRROR SFG D21 LH</option>
+          <option>RMPAPI01 - MOLDING RH</option>
+        </select>
+
+        <input type="number" id="inQty" class="w-full border rounded-lg px-3 py-2" placeholder="Qty">
+
+        <select id="inTo" class="w-full border rounded-lg px-3 py-2">
+          <option value="">Gudang Tujuan</option>
+          <option>Gudang Raw Material</option>
+        </select>
+
+        <button id="btnTransferIn"
+          class="w-full bg-emerald-600 text-white py-2 rounded-lg">
+          Transfer In
+        </button>
+      </div>
+    </div>
+
+  
+    <div class="bg-white rounded-2xl shadow p-5">
+      <h2 class="text-lg font-semibold mb-4 text-rose-600">
+        Transfer Out (Transfer Internal Gudang)
+      </h2>
+
+      <div class="space-y-4">
+        <input type="date" id="outDate" class="w-full border rounded-lg px-3 py-2">
+
+        <select id="outArticle" class="w-full border rounded-lg px-3 py-2">
+          <option value="">Pilih Article</option>
+         <option>FGAPI0014 - COVER UPR OUTER MIRROR LH SILVER (B2) D21_SB</option>
+          <option>FGAPI0028 - COVER OUTER MIRROR LH D21 BLACK X13	</option>
+          <option>FGAPI0003	- MOLDING QTR WIN UPR RH 62791-0K03000_SB</option>
+          <option>FGAPI0066 - ASSY MOLDING QTR WIN UPR RH 62791-0K03000_SB</option>
+        </select>
+
+        <input type="number" id="outQty" class="w-full border rounded-lg px-3 py-2" placeholder="Qty">
+
+        <select id="outFrom" class="w-full border rounded-lg px-3 py-2">
+          <option value="">Gudang Sumber</option>
+          <option>Gudang Raw Material</option>
+        </select>
+
+        <select id="outTo" class="w-full border rounded-lg px-3 py-2">
+           <option value="">Gudang Tujuan</option>
+          <option>Spraybooth 1A</option>
+        </select>
+
+        <button id="btnTransferOut"
+          class="w-full bg-rose-600 text-white py-2 rounded-lg">
+          Transfer Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+ 
+  <div class="bg-white rounded-2xl shadow p-5">
+    <h2 class="text-lg font-semibold mb-4">Tabel Pergerakan</h2>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full border text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border px-3 py-2">Tanggal</th>
+            <th class="border px-3 py-2">Tipe</th>
+            <th class="border px-3 py-2">Gudang Sumber</th>
+            <th class="border px-3 py-2">Gudang Tujuan</th>
+            <th class="border px-3 py-2">Article</th>
+            <th class="border px-3 py-2 text-right">Qty</th>
+          </tr>
+        </thead>
+        <tbody id="movementBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+ 
+  <div class="bg-white rounded-2xl shadow p-5">
+    <h2 class="text-lg font-semibold mb-4">Stock Per Gudang</h2>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full border text-sm">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="border px-3 py-2">Gudang</th>
+            <th class="border px-3 py-2">Article</th>
+            <th class="border px-3 py-2 text-right">Qty</th>
+          </tr>
+        </thead>
+        <tbody id="stockBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function successAlert(title, text) {
+  Swal.fire({
+    icon: 'success',
+    title,
+    text,
+    timer: 2000,
+    showConfirmButton: false
+  });
+}
+
+function errorAlert(text) {
+  Swal.fire({
+    icon: 'error',
+    title: 'Gagal',
+    text
+  });
+}
+
+$(function () {
+
+ const fgToRmMap = {
+  'FGAPI0014': 'RMNPAPI04',
+  'FGAPI0028': 'RMNPAPI04',
+  'FGAPI0003': 'RMPAPI01',
+  'FGAPI0066': 'RMPAPI01'
+};
+
+
+  
+  let stocks = [
+    { warehouse: 'Gudang Raw Material', article: 'RMPAPI01 - MOLDING RH', qty: 12 }
+  ];
+
+  let movements = [];
+
+  
+  function findStock(warehouse, article) {
+    return stocks.find(s => s.warehouse === warehouse && s.article === article);
+  }
+
+  function addStock(warehouse, article, qty) {
+    let s = findStock(warehouse, article);
+    s ? s.qty += qty : stocks.push({ warehouse, article, qty });
+  }
+
+  function reduceStock(warehouse, article, qty) {
+    let s = findStock(warehouse, article);
+    if (!s || s.qty < qty) return false;
+    s.qty -= qty;
+    return true;
+  }
+
+  function renderStock() {
+    const $tbody = $('#stockBody').empty();
+    stocks.filter(s => s.qty > 0).forEach(s => {
+      $tbody.append(`
+        <tr>
+          <td class="border px-3 py-2">${s.warehouse}</td>
+          <td class="border px-3 py-2">${s.article}</td>
+          <td class="border px-3 py-2 text-right">${s.qty}</td>
+        </tr>
+      `);
+    });
+  }
+
+  function renderMovement() {
+    const $tbody = $('#movementBody').empty();
+    movements.forEach(m => {
+      $tbody.append(`
+        <tr>
+          <td class="border px-3 py-2">${m.date}</td>
+          <td class="border px-3 py-2">${m.type}</td>
+          <td class="border px-3 py-2">${m.from}</td>
+          <td class="border px-3 py-2">${m.to}</td>
+          <td class="border px-3 py-2">${m.article}</td>
+          <td class="border px-3 py-2 text-right">${m.qty}</td>
+        </tr>
+      `);
+    });
+  }
+
+  
+  $('#btnTransferIn').on('click', function () {
+    const date    = $('#inDate').val();
+    const from    = $('#inFrom').val();
+    const article = $('#inArticle').val();
+    const qty     = parseInt($('#inQty').val());
+    const to      = $('#inTo').val();
+
+    if (!date || !from || !article || !qty || !to) {
+      errorAlert('Lengkapi Transfer IN');
+      return;
+    }
+
+    movements.push({ date, type: 'IN', from, to, article, qty });
+    addStock(to, article, qty);
+
+    renderMovement();
+    renderStock();
+
+successAlert(
+  'Transfer IN Berhasil',
+  `${article} sebanyak ${qty} berhasil masuk ke ${to}`
+);
+  });
+
+ 
+$('#btnTransferOut').on('click', function () {
+  const date       = $('#outDate').val();
+  const fgText     = $('#outArticle').val();
+  const qty        = parseInt($('#outQty').val());
+  const from       = $('#outFrom').val();
+  const to         = $('#outTo').val();
+
+  if (!date || !fgText || !qty || !from || !to) {
+     errorAlert('Lengkapi Transfer Out');
+    return;
+  }
+
+  const fgCode = fgText.split(' - ')[0].trim();
+
+ 
+  if (
+    from === 'Gudang Raw Material' &&
+    to.startsWith('Spraybooth') &&
+    fgToRmMap[fgCode]
+  ) {
+
+    const rmCode = fgToRmMap[fgCode];
+
+    const rmStock = stocks.find(s =>
+      s.warehouse === from &&
+      s.article.startsWith(rmCode)
+    );
+
+    if (!rmStock || rmStock.qty < qty) {
+      errorAlert('Stock RM tidak mencukupi');
+      return;
+    }
+
+   
+    rmStock.qty -= qty;
+
+   
+    addStock(to, fgText, qty);
+
+    movements.push({
+      date,
+      type: 'OUT',
+      from: `${from} (RM)`,
+      to,
+      article: `${fgText} (Tapi yang berkurang di Gudang Raw Material yaitu RM, Berdasarkan Relasi BOM)`,
+      qty
+    });
+
+  } else {
+
+   
+    if (!reduceStock(from, fgText, qty)) {
+       errorAlert('Stock tidak mencukupi');
+      return;
+    }
+
+    addStock(to, fgText, qty);
+
+    movements.push({
+      date,
+      type: 'OUT',
+      from,
+      to,
+      article: fgText,
+      qty
+    });
+  }
+
+  renderMovement();
+  renderStock();
+
+successAlert(
+  'Transfer Out Berhasil',
+  `${article} sebanyak ${qty} berhasil masuk ke ${to}`
+);
+});
+
+
+ 
+  renderStock();
+});
+</script>
+</body>
+</html>
